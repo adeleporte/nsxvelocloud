@@ -17,4 +17,11 @@
     - role: base-config-nsx
   tags: nsx_install
 
-
+- name: Lab NSX Deployment (Deploy LS and Edges)
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  roles:
+    - role: lab-config-nsx
+  tags: lab_install

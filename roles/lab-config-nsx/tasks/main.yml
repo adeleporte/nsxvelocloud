@@ -1,0 +1,92 @@
+---
+- name: gather moid for ds
+  vcenter_gather_moids:
+    hostname: "{{ deployVcIPAddress }}"
+    username: "{{ deployVcUser }}"
+    password: "{{ deployVcPassword }}"
+    datacenter_name: "{{ deployDataCenterName }}"
+    datastore_name: "{{ deployMgmtDatastoreName }}"
+    validate_certs: False
+  register: gather_moids_ds
+  tags: esg_create
+
+- name: gather moid for cl
+  vcenter_gather_moids:
+    hostname: "{{ deployVcIPAddress }}"
+    username: "{{ deployVcUser }}"
+    password: "{{ deployVcPassword }}"
+    datacenter_name: "{{ deployDataCenterName }}"
+    cluster_name: "{{ deployCluster }}"
+    validate_certs: False
+  register: gather_moids_cl
+  tags: esg_create
+
+- name: gather moid for uplink vnic
+  vcenter_gather_moids:
+    hostname: "{{ deployVcIPAddress }}"
+    username: "{{ deployVcUser }}"
+    password: "{{ deployVcPassword }}"
+    datacenter_name: "{{ deployDataCenterName }}"
+    portgroup_name: "{{ deployMgmtPortGroup }}"
+    validate_certs: False
+  register: gather_moids_upl_pg
+  tags: esg_create
+
+- name: Create Logical Switches
+  nsx_logical_switch:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    transportzone: "TZ1"
+    name: "{{ item.name }}"
+    description: "My Great Logical Switch"
+  with_items: "{{ lab_ls }}"
+  register: create_logical_switch
+
+- name: ESG creation
+  nsx_edge_router:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    name: 'AnsibleInternetRouter'
+    description: 'Internet Ansible Router'
+    resourcepool_moid: "{{ gather_moids_cl.object_id }}"
+    datastore_moid: "{{ gather_moids_ds.object_id }}"
+    datacenter_moid: "{{ gather_moids_cl.datacenter_moid }}"
+    interfaces: "{{ internet_edge_interfaces }}"
+    default_gateway: "{{ internet_edge_defaultGW }}"
+    #default_gateway_adminDistance: 5
+    #routes:
+    #  - {network: '10.11.12.0/24', next_hop: '192.168.178.2', admin_distance: '1', mtu: '1500', description: 'very important route'}
+    #  - {network: '10.11.13.0/24', next_hop: '192.168.178.2', mtu: '1600'}
+    #  - {network: '10.11.14.0/24', next_hop: '192.168.178.2'}
+    remote_access: 'true'
+    username: 'admin'
+    password: 'VMware1!VMware1!'
+    firewall: 'false'
+    ha_enabled: 'false'
+  register: create_internet_esg
+  tags: esg_internet_create
+
+- name: ESG creation
+  nsx_edge_router:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    name: 'AnsibleMplsRouter'
+    description: 'Mpls Ansible Router'
+    resourcepool_moid: "{{ gather_moids_cl.object_id }}"
+    datastore_moid: "{{ gather_moids_ds.object_id }}"
+    datacenter_moid: "{{ gather_moids_cl.datacenter_moid }}"
+    interfaces: "{{ mpls_edge_interfaces }}"
+    #default_gateway: "{{ internet_edge_defaultGW }}"
+    #default_gateway_adminDistance: 5
+    #routes:
+    #  - {network: '10.11.12.0/24', next_hop: '192.168.178.2', admin_distance: '1', mtu: '1500', description: 'very important route'}
+    #  - {network: '10.11.13.0/24', next_hop: '192.168.178.2', mtu: '1600'}
+    #  - {network: '10.11.14.0/24', next_hop: '192.168.178.2'}
+    remote_access: 'true'
+    username: 'admin'
+    password: 'VMware1!VMware1!'
+    firewall: 'false'
+    ha_enabled: 'false'
+  register: create_mpls_esg
+  tags: esg_mpls_create
+
