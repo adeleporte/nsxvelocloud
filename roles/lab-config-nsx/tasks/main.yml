@@ -42,6 +42,8 @@
   with_items: "{{ lab_ls }}"
   register: create_logical_switch
 
+- debug: var=create_logical_switch
+
 - name: ESG creation
   nsx_edge_router:
     nsxmanager_spec: "{{ nsxmanager_spec }}"
@@ -61,7 +63,7 @@
     remote_access: 'true'
     username: 'admin'
     password: 'VMware1!VMware1!'
-    firewall: 'false'
+    firewall: 'true'
     ha_enabled: 'false'
   register: create_internet_esg
   tags: esg_internet_create
@@ -89,4 +91,64 @@
     ha_enabled: 'false'
   register: create_mpls_esg
   tags: esg_mpls_create
+
+
+- name: Create NAT rules
+  nsx_edge_nat:
+    nsxmanager_spec: '{{ nsxmanager_spec }}'
+    mode: 'create'
+    name: 'AnsibleInternetRouter'
+    rules:
+      dnat0: { description: 'NAT rule to VCO',
+               loggingEnabled: 'true',
+               rule_type: 'dnat',
+               nat_enabled: 'true',
+               dnatMatchSourceAddress: 'any',
+               dnatMatchSourcePort: 'any',
+               vnic: '0',
+               protocol: 'tcp',
+               originalAddress: '{{ vco.eth0.natipAnsible }}',
+               originalPort: '1022',
+               translatedAddress: '{{ vco.eth0.ipAddress }}',
+               translatedPort: '22'
+             }
+      dnat1: { description: 'Nat rule to VCG1',
+               loggingEnabled: 'true',
+               rule_type: 'dnat',
+               vnic: '0',
+               nat_enabled: 'true',
+               dnatMatchSourceAddress: 'any',
+               dnatMatchSourcePort: 'any',
+               protocol: 'tcp',
+               originalAddress: '{{ vcg1.eth0.natipAnsible }}',
+               originalPort: '1023',
+               translatedAddress: '{{ vcg1.eth0.ipAddress }}',
+               translatedPort: '22'
+             }
+      dnat2: { description: 'Nat rule to VCG2',
+               loggingEnabled: 'true',
+               rule_type: 'dnat',
+               vnic: '0',
+               nat_enabled: 'true',
+               dnatMatchSourceAddress: 'any',
+               dnatMatchSourcePort: 'any',
+               protocol: 'tcp',
+               originalAddress: '{{ vcg2.eth0.natipAnsible }}',
+               originalPort: '1024',
+               translatedAddress: '{{ vcg2.eth0.ipAddress }}',
+               translatedPort: '22'
+             }
+      snat0: { description: 'Source NAT rule',
+               loggingEnabled: 'true',
+               rule_type: 'snat',
+               vnic: '0',
+               nat_enabled: 'true',
+               snatMatchDestinationAddress: 'any',
+               snatMatchDestinationPort: 'any',
+               protocol: 'any',
+               originalAddress: '20.20.0.0/16',
+               originalPort: 'any',
+               translatedAddress: '{{ internet_edge_interfaces.vnic0.ip }}',
+               translatedPort: 'any'
+             }
 
