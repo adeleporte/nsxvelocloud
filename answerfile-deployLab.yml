@@ -1,0 +1,99 @@
+# Deploy vCenter section
+# the following section defines the vCenter / vSphere environment
+# were the NSX Manager OVA gets deployed. This can be a separate management vCenter,
+# or the same vCenter to which NSX Manager gets registered
+deployVcIPAddress: 'vcsa.cpod-velocloud.shwrfr.mooo.com'
+deployVcUser: 'administrator@cpod-velocloud.shwrfr.mooo.com'
+deployVcPassword: 'VMware1!'
+
+# with NSX 6.2.2 and later you need licnse in order to prepare the hosts
+# Uncomment the line below and provide valid license key, otherwise the deployment will fail before preparing the clusters
+license_key: '5423J-JL20M-38L89-0L7HH-A0PQ5'
+
+# NSX Manager OVA deployment parameters
+# this section holds all parameters needed to deploy the NSX Manager OVA like IP address, etc.
+deployMgmtPortGroup: 'DPortGroup'
+deployDataCenterName: "cPod-VELOCLOUD"
+deployCluster: 'Cluster'
+deployMgmtDatastoreName: 'Datastore'
+deployMgmtIpAddress: '172.18.6.4'
+deployMgmtDefaultGateway: '172.18.6.1'
+deployMgmtNetmask: '255.255.255.0'
+deployMgmtDnsServer: '172.18.6.1'
+deployMgmtDnsDomain: 'cpod-velocloud.shwrfr.mooo.com'
+deployNtpServers: '172.18.6.1'
+deploySyslogServer: '172.18.6.1'
+deployVmName: 'nsxmanager'
+deployHostname: 'nsx.cpod-velocloud.shwrfr.mooo.com'
+nsxCliPass: 'VMware1!VMware1!'
+nsxEnPass: 'VMware1!VMware1!'
+
+nsxmanOvaPath: '/home/images'
+nsxmanOva: 'VMware-NSX-Manager-6.4.1-8599035.ova'
+ovfToolPath: '/usr/bin'  # Use '/Applications' if using ovftool on a MAC
+
+# Target 'register' vCenter section
+# the following section defines the vCenter / vSphere environment
+# to which NSX Manager will be registered to. This can be the same as deploy vCenter,
+# or a separate 'payload' vCenter
+vcHostname: "vcsa.cpod-velocloud.shwrfr.mooo.com"
+vcIpAddress: "172.18.6.3"
+vcUser: "administrator@cpod-velocloud.shwrfr.mooo.com"
+vcPassword: "VMware1!"
+vcSsoHostname: "vcsa.cpod-velocloud.shwrfr.mooo.com"
+vcSsoUser: "administrator@cpod-velocloud.shwrfr.mooo.com"
+vcSsoPassword: "VMware1!"
+
+# NSX Manager credentials and RAML file path
+nsxmanager_spec:
+  raml_file: 'nsxraml/nsxvapi.raml'
+  host: "{{ deployMgmtIpAddress }}"
+  user: 'admin'
+  password: "{{ nsxCliPass }}"
+
+# NSX configuration details
+# including controller deployment environment details and IP Pools
+nsxControllerPortGroup: 'DPortGroup'
+nsxControllerDatastore: 'Datastore'
+nsxControllerVcCluster: 'Cluster'
+controllerDeployType: 'lab'
+controllerPassword: 'VMware1!VMware1!'
+controllerSyslogServer: '172.18.6.1'
+targetDatacenterName: 'cPod-VELOCLOUD'
+targetVdsName: 'DVS'
+transportZoneName: 'TZ1'
+transportZoneDescription: 'Default TZ'
+defaultControllPlaneMode: 'UNICAST_MODE'
+
+nsxIppools:
+  controller:
+    name: 'controller'
+    start_ip: '172.18.6.5'
+    end_ip: '172.18.6.7'
+    prefix_length: '24'
+    gateway: '172.18.6.1'
+    dns_server_1: '172.18.6.1'
+    dns_server_2: ''
+  vteps:
+    name: 'vteps'
+    start_ip: '172.18.6.8'
+    end_ip: '172.18.6.10'
+    prefix_length: '24'
+    gateway: '172.18.6.1'
+    dns_server_1: '172.18.6.1'
+    dns_server_2: ''
+
+# ID Pool for VXLAN
+segmentIdPoolStart: '5000'
+segmentIdPoolEnd: '10000'
+mcastEnabled: 'True'
+mcastAddrStart: '239.0.0.0'
+mcastAddrEnd: '239.255.255.255'
+vtep_vlan_id: '0'
+
+# Target vCenter Cluster Section
+# the following section defines which clusters in the target vCenter should
+# be prepared for NSX (VIB deployment)
+targetClusters:
+  cluster1:
+    clusterName: 'Cluster'

@@ -1,0 +1,25 @@
+---
+- name: deploy nsx-man
+  nsx_deploy_ova:
+    ovftool_path: "{{ ovfToolPath }}"
+    datacenter: "{{ deployDataCenterName }}"
+    datastore: "{{ deployMgmtDatastoreName}}"
+    portgroup: "{{ deployMgmtPortGroup }}"
+    cluster: "{{ deployCluster }}"
+    vmname: "{{ deployVmName }}"
+    hostname: "{{ deployHostname }}"
+    dns_server: "{{ deployMgmtDnsServer }}"
+    dns_domain: "{{ deployMgmtDnsDomain }}"
+    ntp_server: "{{ deployNtpServers }}"
+    gateway: "{{ deployMgmtDefaultGateway }}"
+    ip_address: "{{ deployMgmtIpAddress }}"
+    netmask: "{{ deployMgmtNetmask }}"
+    admin_password: "{{ nsxCliPass }}"
+    enable_password: "{{ nsxEnPass }}"
+    path_to_ova: "{{ nsxmanOvaPath }}"
+    ova_file: "{{ nsxmanOva }}"
+    vcenter: "{{ deployVcIPAddress }}"
+    vcenter_user: "{{ deployVcUser }}"
+    vcenter_passwd: "{{ deployVcPassword }}"
+  register: deploy_nsx_man
+  tags: nsx_deploy_ova

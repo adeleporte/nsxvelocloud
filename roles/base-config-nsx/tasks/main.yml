@@ -1,0 +1,193 @@
+---
+- name: Register NSX Manager to vCenter
+  nsx_vc_registration:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    vcenter: "{{ vcIpAddress }}"
+    vcusername: "{{ vcUser }}"
+    vcpassword: "{{ vcPassword }}"
+    accept_all_certs: true
+  register: vc_registration
+  tags: nsx_vc_registration
+
+
+- name: Connect NSX Manager to SSO
+  nsx_sso_registration:
+    state: present
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    sso_lookupservice_url: 'lookupservice/sdk'
+    sso_lookupservice_port: 443
+    sso_lookupservice_server: "{{ vcSsoHostname }}"
+    sso_admin_username: "{{ vcSsoUser }}"
+    sso_admin_password: "{{ vcSsoPassword }}"
+    accept_all_certs: true
+  tags: nsx_vc_registration
+
+
+- name: Gather vCenter Mgmt Cluster moid
+  vcenter_gather_moids:
+    hostname: "{{ vcHostname }}"
+    username: "{{ vcUser }}"
+    password: "{{ vcPassword }}"
+    datacenter_name: "{{ targetDatacenterName }}"
+    cluster_name: "{{ targetClusters.cluster1.clusterName }}"
+    validate_certs: False
+  register: vcenter_mgmt_cluster_moid
+  tags: vsphere_facts
+
+- name: Gather vCenter Cluster moid to deploy controllers
+  vcenter_gather_moids:
+    hostname: "{{ vcHostname }}"
+    username: "{{ vcUser }}"
+    password: "{{ vcPassword }}"
+    datacenter_name: "{{ targetDatacenterName }}"
+    cluster_name: "{{ nsxControllerVcCluster }}"
+    validate_certs: False
+  register: vcenter_ctrl_cluster_moid
+  tags: vsphere_facts
+
+
+- name: Gather vCenter management datastore moid
+  vcenter_gather_moids:
+    hostname: "{{ vcHostname }}"
+    username: "{{ vcUser }}"
+    password: "{{ vcPassword }}"
+    datacenter_name: "{{ targetDatacenterName }}"
+    datastore_name: "{{ nsxControllerDatastore }}"
+    validate_certs: False
+  register: vcenter_mgmt_datastore_moid
+  tags: vsphere_facts
+
+
+- name: Gather vCenter management portgroup moid
+  vcenter_gather_moids:
+    hostname: "{{ vcHostname }}"
+    username: "{{ vcUser }}"
+    password: "{{ vcPassword }}"
+    datacenter_name: "{{ targetDatacenterName }}"
+    portgroup_name: "{{ nsxControllerPortGroup }}"
+    validate_certs: False
+  register: vcenter_mgmt_portgroup_moid
+  tags: vsphere_facts
+
+
+- name: Create IP Controller IP Pools
+  nsx_ippool:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    name: "{{ nsxIppools.controller.name }}"
+    start_ip: "{{ nsxIppools.controller.start_ip }}"
+    end_ip: "{{ nsxIppools.controller.end_ip }}"
+    prefix_length: "{{ nsxIppools.controller.prefix_length }}"
+    gateway: "{{ nsxIppools.controller.gateway }}"
+    dns_server_1: "{{ nsxIppools.controller.dns_server_1 }}"
+    dns_server_2: "{{ nsxIppools.controller.dns_server_2 }}"
+  register: controller_ip_pool
+  tags: controller_nsx_ippools
+
+
+- name: Create NSX Controller cluster
+  nsx_controllers:
+      nsxmanager_spec: "{{ nsxmanager_spec }}"
+      state: present
+      deploytype: "{{ controllerDeployType }}"
+      syslog_server: "{{ controllerSyslogServer }}"
+      ippool_id: "{{ controller_ip_pool.ippool_id }}"
+      resourcepool_moid: "{{ vcenter_ctrl_cluster_moid.object_id }}"
+      datastore_moid: "{{ vcenter_mgmt_datastore_moid.object_id }}"
+      network_moid: "{{ vcenter_mgmt_portgroup_moid.object_id }}"
+      password: "{{ controllerPassword }}"
+  tags: nsx_controllers
+
+- name: Apply NSX License
+  vcenter_nsx_license:
+    vcenter: "{{ vcHostname }}"
+    vcenter_user: "{{ vcUser }}"
+    vcenter_passwd: "{{ vcPassword }}"
+    license_key: "{{ license_key }}"
+  when: license_key is defined
+  register: nsxlic
+  tags: nsx_license
+
+- name: Gather vCenter compute Cluster moid
+  vcenter_gather_moids:
+    hostname: "{{ vcHostname }}"
+    username: "{{ vcUser }}"
+    password: "{{ vcPassword }}"
+    datacenter_name: "{{ targetDatacenterName }}"
+    cluster_name: "{{ targetClusters.cluster1.clusterName }}"
+    validate_certs: False
+  register: vcenter_compute_cluster_moid
+  tags: vsphere_facts
+
+
+- name: Install VIBs (prepare) the compute cluster
+  nsx_cluster_prep:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    cluster_moid: "{{ vcenter_compute_cluster_moid.object_id }}"
+  register: cluster_prep_compute
+  tags: nsx_cluster_prep
+
+- name: Gather vCenter Transport DVS moid
+  vcenter_gather_moids:
+    hostname: "{{ vcHostname }}"
+    username: "{{ vcUser }}"
+    password: "{{ vcPassword }}"
+    datacenter_name: "{{ targetDatacenterName }}"
+    dvs_name: "{{ targetVdsName }}"
+    validate_certs: False
+  register: vcenter_dvs_moid
+  tags: vsphere_facts
+
+
+- name: Create VTEP IP Pools
+  nsx_ippool:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    name: "{{ nsxIppools.vteps.name }}"
+    start_ip: "{{ nsxIppools.vteps.start_ip }}"
+    end_ip: "{{ nsxIppools.vteps.end_ip }}"
+    prefix_length: "{{ nsxIppools.vteps.prefix_length }}"
+    gateway: "{{ nsxIppools.vteps.gateway }}"
+    dns_server_1: "{{ nsxIppools.vteps.dns_server_1 }}"
+    dns_server_2: "{{ nsxIppools.vteps.dns_server_2 }}"
+  register: vtep_ip_pool
+  tags: vtep_nsx_ippools
+
+
+- name: VXLAN Prep (configure VTEP) on compute cluster
+  nsx_vxlan_prep:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    cluster_moid: "{{ vcenter_compute_cluster_moid.object_id }}"
+    dvs_moid: "{{ vcenter_dvs_moid.object_id }}"
+    ippool_id: "{{ vtep_ip_pool.ippool_id }}"
+    vlan_id: "{{ vtep_vlan_id }}"
+  register: vxlan_prep
+  tags: nsx_vxlan_prep
+
+- name: Create Segment Id Pool
+  nsx_segment_id_pool:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: present
+    idpoolstart: "{{ segmentIdPoolStart }}"
+    idpoolend: "{{ segmentIdPoolEnd }}"
+    mcast_enabled: "{{ mcastEnabled }}"
+    mcastpoolstart: "{{ mcastAddrStart }}"
+    mcastpoolend: "{{ mcastAddrEnd }}"
+  register: segment_pool
+  tags: nsx_segment_pool
+
+
+- name: Add a Transport Zone with the Cluters as members
+  nsx_transportzone:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    state: 'present'
+    name: "{{ transportZoneName }}"
+    controlplanemode: "{{ defaultControllPlaneMode }}"
+    description: "{{ transportZoneDescription }}"
+    cluster_moid_list:
+      - "{{ vcenter_compute_cluster_moid.object_id }}"
+  register: transport_zone
+  tags: nsx_transport_zone
+
