@@ -1,0 +1,58 @@
+---
+- name: Deploy NSX OVA
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  roles:
+    - role: deploy-nsx-ova
+  tags: nsx_ova
+
+- name: Base NSX Deployment (Install)
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  roles:
+    - role: base-config-nsx
+  tags: nsx_install
+
+- name: Lab NSX Deployment (Deploy LS and Edges)
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  roles:
+    - role: lab-config-nsx
+  tags: lab_install
+
+- name: Lab Velocloud Deployment (Deploy VCO)
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  roles:
+    - role: deploy-vco-ova
+  tags: vco_install
+
+- name: Lab Velocloud Deployment (Deploy VCG1)
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  vars:
+     vcg: '{{ vcg1 }}'
+  roles:
+    - role: deploy-vcg
+  tags: vcg_install
+
+- name: Lab Velocloud Deployment (Deploy VCG2)
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - answerfile-deployLab.yml
+  vars:
+     vcg: '{{ vcg2 }}'
+  roles:
+    - role: deploy-vcg
+  tags: vcg_install

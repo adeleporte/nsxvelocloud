@@ -1,0 +1,45 @@
+---
+- name: Manage Velocloud Gateways
+  gateway:
+    host: "{{ vco.eth0.natipAnsible }}"
+    user: "{{ vco.username }}"
+    password: "{{ vco.password }}"
+    gateway_name: "{{ vcg.hostname }}"
+    description: "{{ vcg.description }}"
+    ip_address: "{{ vcg.eth0.ipAddress }}"
+    state: present
+  register: vcg_results
+  tags: vcg
+
+- debug:
+    msg: "{{ vcg_results }}"
+
+- name: deploy_vcg
+  vcg_deploy_ova:
+    ovftool_path: '{{ ovfToolPath }}'
+    ova_file: '{{ vcg.image }}'
+    vcenter: '{{ deployVcIPAddress }}'
+    vcenter_user: '{{ deployVcUser }}'
+    vcenter_passwd: '{{ deployVcPassword }}'
+    datacenter: '{{ deployDataCenterName }}'
+    cluster: '{{ deployCluster }}'
+    datastore: '{{ deployMgmtDatastoreName }}'
+    portgroup_out: '{{ vcg.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    portgroup_in: "{{ 'ls_null'|to_portgroup( nsxmanager_spec, transportZoneName ) }}"
+    vmname: '{{ vcg.hostname }}'
+    instanceid: '{{ vcg.instanceid }}'
+    vcoaddress: '{{ vco.eth0.ipAddress }}'
+    activationcode: "{{ vcg_results.meta.activationKey }}"
+    hostname: '{{ vcg.hostname }}'
+    password: '{{ vcg.password }}'
+    publickeys: '{{ vcg.publickeys }}'
+    #dns1: '{{ dns1 }}'
+    #dns2: '{{ dns2 }}'
+    eth0ipAllocationType: '{{ vcg.eth0.ipAllocationType }}'
+    eth0ipAddress: '{{ vcg.eth0.ipAddress }}'
+    eth0subnetMask: '{{ vcg.eth0.subnetMask }}'
+    eth0gatewayAddress: '{{ vcg.eth0.gatewayAddress }}'
+    userdata: "{{ lookup('template', 'templates/vcg-user-data.j2') | b64encode }}"
+  register: deploy_vcg
+
+

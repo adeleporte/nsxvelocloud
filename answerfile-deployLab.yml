@@ -101,24 +101,25 @@ targetClusters:
 # Lab Config
 lab_ls:
   - { name: 'ls_internet' }
-    #  - { name: 'ls_lan_dc1' }
-    #  - { name: 'ls_lan_dc2' }
-    #  - { name: 'ls_lan_bronze' }
-    #  - { name: 'ls_lan_silver1' }
-    #  - { name: 'ls_lan_silver2' }
-    #  - { name: 'ls_lan_silver3' }
-    #  - { name: 'ls_internet1_bronze' }
-    #  - { name: 'ls_internet2_bronze' }
-    #  - { name: 'ls_internet_silver1' }
-    #  - { name: 'ls_internet_silver2' }
-    #  - { name: 'ls_internet_silver3' }
-    #  - { name: 'ls_internet_dc1' }
-    #  - { name: 'ls_internet_dc2' }
-    #  - { name: 'ls_mpls_dc1' }
-    #  - { name: 'ls_mpls_dc2' }
-    #  - { name: 'ls_mpls_silver1' }
-    #  - { name: 'ls_mpls_silver2' }
-    #  - { name: 'ls_mpls_silver3' }
+  - { name: 'ls_lan_dc1' }
+  - { name: 'ls_lan_dc2' }
+  - { name: 'ls_lan_bronze' }
+  - { name: 'ls_lan_silver1' }
+  - { name: 'ls_lan_silver2' }
+  - { name: 'ls_lan_silver3' }
+  - { name: 'ls_internet1_bronze' }
+  - { name: 'ls_internet2_bronze' }
+  - { name: 'ls_internet_silver1' }
+  - { name: 'ls_internet_silver2' }
+  - { name: 'ls_internet_silver3' }
+  - { name: 'ls_internet_dc1' }
+  - { name: 'ls_internet_dc2' }
+  - { name: 'ls_mpls_dc1' }
+  - { name: 'ls_mpls_dc2' }
+  - { name: 'ls_mpls_silver1' }
+  - { name: 'ls_mpls_silver2' }
+  - { name: 'ls_mpls_silver3' }
+  - { name: 'ls_null' }
 
 internet_edge_interfaces:    
   vnic0: {ip: '172.18.6.250', prefix_len: 24, portgroup_id: "{{ gather_moids_upl_pg.object_id }}", name: 'Uplink vnic', iftype: 'uplink'}
@@ -145,42 +146,45 @@ mpls_edge_interfaces:
 vco:
   instanceid: vco
   hostname: vco
-  password: Velocloud123
-  image: 'images/velocloud-vco-3.2.0-GA-20180409.ova'
-  portgroup: 'ls_internet'
+  username: super@velocloud.net
+  password: vcadm!n
+  image: 'images/velocloud-vco-3.2.0-GA-20180511.ova'
+  ls: 'ls_internet'
   eth0:
     ipAllocationType: 'STATIC'
     ipAddress: '20.20.20.200'
     natipAnsible: '172.18.6.250'
     subnetMask: '255.255.255.0'
     gatewayAddress: '20.20.20.1'
-    publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
+  publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
 
 vcg1:
   instanceid: vcg1
   hostname: vcg1
+  description: vcg1
   password: Velocloud123
   image: 'images/velocloud-vcg-3.2.0-49-R320-20180409-GA.ova'
-  portgroup: 'ls_internet'
+  ls: 'ls_internet'
   eth0:
     ipAllocationType: 'STATIC'
     ipAddress: '20.20.20.11'
     natipAnsible: '172.18.6.250'
     subnetMask: '255.255.255.0'
     gatewayAddress: '20.20.20.1'
-    publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
+  publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
 
 vcg2:
   instanceid: vcg2
   hostname: vcg2
+  description: vcg2
   password: Velocloud123
   image: 'images/velocloud-vcg-3.2.0-49-R320-20180409-GA.ova'
-  portgroup: 'ls_internet'
+  ls: 'ls_internet'
   eth0:
     ipAllocationType: 'STATIC'
     ipAddress: '20.20.20.12'
     natipAnsible: '172.18.6.250'
     subnetMask: '255.255.255.0'
     gatewayAddress: '20.20.20.1'
-    publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
+  publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
     
