@@ -101,24 +101,24 @@ targetClusters:
 # Lab Config
 lab_ls:
   - { name: 'ls_internet' }
-  - { name: 'ls_lan_dc1' }
-  - { name: 'ls_lan_dc2' }
-  - { name: 'ls_lan_bronze' }
-  - { name: 'ls_lan_silver1' }
-  - { name: 'ls_lan_silver2' }
-  - { name: 'ls_lan_silver3' }
-  - { name: 'ls_internet1_bronze' }
-  - { name: 'ls_internet2_bronze' }
-  - { name: 'ls_internet_silver1' }
-  - { name: 'ls_internet_silver2' }
-  - { name: 'ls_internet_silver3' }
-  - { name: 'ls_internet_dc1' }
-  - { name: 'ls_internet_dc2' }
-  - { name: 'ls_mpls_dc1' }
-  - { name: 'ls_mpls_dc2' }
-  - { name: 'ls_mpls_silver1' }
-  - { name: 'ls_mpls_silver2' }
-  - { name: 'ls_mpls_silver3' }
+    #  - { name: 'ls_lan_dc1' }
+    #  - { name: 'ls_lan_dc2' }
+    #  - { name: 'ls_lan_bronze' }
+    #  - { name: 'ls_lan_silver1' }
+    #  - { name: 'ls_lan_silver2' }
+    #  - { name: 'ls_lan_silver3' }
+    #  - { name: 'ls_internet1_bronze' }
+    #  - { name: 'ls_internet2_bronze' }
+    #  - { name: 'ls_internet_silver1' }
+    #  - { name: 'ls_internet_silver2' }
+    #  - { name: 'ls_internet_silver3' }
+    #  - { name: 'ls_internet_dc1' }
+    #  - { name: 'ls_internet_dc2' }
+    #  - { name: 'ls_mpls_dc1' }
+    #  - { name: 'ls_mpls_dc2' }
+    #  - { name: 'ls_mpls_silver1' }
+    #  - { name: 'ls_mpls_silver2' }
+    #  - { name: 'ls_mpls_silver3' }
 
 internet_edge_interfaces:    
   vnic0: {ip: '172.18.6.250', prefix_len: 24, portgroup_id: "{{ gather_moids_upl_pg.object_id }}", name: 'Uplink vnic', iftype: 'uplink'}

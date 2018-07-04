@@ -1,0 +1,34 @@
+#!/usr/bin/python
+def retrieve_scope(module, session, tz_name):
+    vdn_scopes = session.read('vdnScopes', 'read')['body']
+    vdn_scope_dict_list = vdn_scopes['vdnScopes']['vdnScope']
+    vdn_scope_id = None
+    if isinstance(vdn_scope_dict_list, dict):
+        if vdn_scope_dict_list['name'] == tz_name:
+            vdn_scope_id = vdn_scope_dict_list['objectId']
+    elif isinstance(vdn_scope_dict_list, list):
+        try:
+            vdn_scope_id = [scope['objectId'] for scope in vdn_scope_dict_list if scope['name'] == tz_name][0]
+        except IndexError:
+            vdn_scope_id = None
+
+    if vdn_scope_id:
+        return vdn_scope_id
+    else:
+        module.fail_json(msg='The transport zone with the name {} could not be found in NSX'.format(tz_name))
+
+
+class FilterModule(object):
+  def filters(self):
+    return {
+             'to_portgroup': self.to_portgroup,
+           }
+ 
+  def to_portgroup(self, a_variable, nsxmanager_spec, transportzone):
+    from nsxramlclient.client import NsxClient
+    client_session=NsxClient(nsxmanager_spec['raml_file'], nsxmanager_spec['host'],
+                             nsxmanager_spec['user'], nsxmanager_spec['password'])
+
+    vdn_scope=retrieve_scope(module, client_session, transportzone)
+    a_new_variable = a_variable + ' CRAZY NEW FILTER'
+    return a_new_variable

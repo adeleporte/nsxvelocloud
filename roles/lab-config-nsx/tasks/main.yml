@@ -40,9 +40,62 @@
     name: "{{ item.name }}"
     description: "My Great Logical Switch"
   with_items: "{{ lab_ls }}"
+  tags: create_logical_switch
   register: create_logical_switch
 
-- debug: var=create_logical_switch
+- debug:
+    msg: "{{ item }}"
+  loop: "{{ create_logical_switch.results }}"
+  tags: create_logical_switch
+
+- name: save information to file
+  uri:
+    url: 'https://{{ nsxmanager_spec.host }}/api/2.0/vdn/virtualwires/{{ item.ls_ops_response.objectId }}'
+    dest: './result_{{ item.ls_ops_response.objectId }}.xml'
+    method: GET
+    validate_certs: no
+    user: '{{ nsxmanager_spec.user }}'
+    password: '{{ nsxmanager_spec.password }}'
+    force_basic_auth: yes
+    return_content: yes
+  loop: "{{ create_logical_switch.results }}"
+  tags: create_logical_switch
+  register: result_ls
+
+#  - debug: var=result_ls1
+- name: ls1_objectID
+  xml:
+    path: './result_{{ item.ls_ops_response.objectId }}.xml'
+    xpath: /virtualWire/vdsContextWithBacking/switch/objectId
+    content: text
+  loop: "{{ create_logical_switch.results }}"
+  register: instance_attributes_ls1_objectId
+
+#  - debug: var=instance_attributes_ls1_objectId.matches[0].objectId
+- name: ls1_vdnId
+  xml:
+    path: './result_{{ item.ls_ops_response.objectId }}.xml'
+    xpath: /virtualWire/vdnId
+    content: text
+  loop: "{{ create_logical_switch.results }}"
+  register: instance_attributes_ls1_vdnId
+
+#  - debug: var=instance_attributes_ls1_vdnId.matches[0].vdnId
+- name: ls1_name
+  xml:
+    path: './result_{{ item.ls_ops_response.objectId }}.xml'
+    xpath: /virtualWire/name
+    content: text
+  loop: "{{ create_logical_switch.results }}"
+  register: instance_attributes_ls1_name
+
+- name: Store VDS Name
+  local_action:
+    module: lineinfile
+    dest: './store.txt'
+    line: 'vxw-{{ instance_attributes_ls1_objectId.matches[0].objectId }}-{{ create_ls1.results[0].ls_ops_response.objectId }}-sid-{{ instance_attributes_ls1_vdnId.matches[0].vdnId }}-{{ instance_attributes_ls1_name.matches[0].name }}'
+    create: yes
+  loop: "{{ create_logical_switch.results }}"
 
 - name: ESG creation
   nsx_edge_router:
