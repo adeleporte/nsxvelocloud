@@ -1,0 +1,107 @@
+---
+- name: Deploy NSX OVA
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - role: deploy-nsx-ova
+    - role: base-config-nsx
+    - role: lab-config-nsx
+    - role: deploy-vco-ova
+  tags: nsx_ova
+
+- name: Lab Velocloud Deployment (Deploy VCG2)
+  hosts: localhost  
+  gather_facts: False
+  vars:
+     vcg: '{{ vcg1 }}'
+  roles:
+    - role: deploy-vcg
+  tags: velocloud, vcg_install
+
+- name: Lab Velocloud Deployment (Deploy VCG2)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vcg: '{{ vcg2 }}'
+  roles:
+    - role: deploy-vcg
+  tags: velocloud, vcg_install
+
+- hosts: localhost
+  tasks:
+    - name: Manage Velocloud Enterprise
+      enterprise:
+        host: "{{ vco.eth0.natipAnsible }}"
+        user: "{{ vco.username }}"
+        password: "{{ vco.password }}"
+        enterprise_name: "My First Customer"
+        state: present
+      register: enterprise
+      tags: velocloud, enterprise
+
+    - name: Manage Velocloud Profiles
+      profile:
+        host: "{{ vco.eth0.natipAnsible }}"
+        user: "{{ vco.username }}"
+        password: "{{ vco.password }}"
+        enterprise_id: "{{ enterprise.entreprise_id }}"
+        profile_name: "My First Profile"
+        state: present
+      register: profile
+      tags: velocloud, profile
+
+- name: Lab Velocloud Deployment (Deploy VCE1)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vce: '{{ vce1 }}'
+  roles:
+    - role: deploy-vce
+  tags: velocloud, vce_install
+
+- name: Lab Velocloud Deployment (Deploy VCE2)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vce: '{{ vce2 }}'
+  roles:
+    - role: deploy-vce
+  tags: velocloud, vce_install
+
+- name: Lab Velocloud Deployment (Deploy VCE3)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vce: '{{ vce3 }}'
+  roles:
+    - role: deploy-vce
+  tags: velocloud, vce_install
+
+- name: Lab Velocloud Deployment (Deploy VCE4)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vce: '{{ vce4 }}'
+  roles:
+    - role: deploy-vce
+  tags: velocloud, vce_install
+
+- name: Lab Velocloud Deployment (Deploy VCE5)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vce: '{{ vce5 }}'
+  roles:
+    - role: deploy-vce
+  tags: velocloud, vce_install
+
+- name: Lab Velocloud Deployment (Deploy VCE6)
+  hosts: localhost
+  gather_facts: False
+  vars:
+     vce: '{{ vce6 }}'
+  roles:
+    - role: deploy-vce
+  tags: velocloud, vce_install
+
+

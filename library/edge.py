@@ -151,7 +151,7 @@ def main():
         # Edge doesn't exist with this name, let's create it
         if module.params['state'] == 'present':
             create_result = create_edge(host, user, password, edge_name, description, model_number, enterprise_id, configuration_id)
-            module.exit_json(changed=True, argument_spec=module.params, edge_id=create_result["id"])
+            module.exit_json(changed=True, argument_spec=module.params, meta=create_result)
         else:
             module.exit_json(changed=False, argument_spec=module.params)
 

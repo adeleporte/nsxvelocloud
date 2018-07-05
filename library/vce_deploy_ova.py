@@ -96,6 +96,8 @@ def main():
             eth3ipAddress=dict(required=False, type='str'),
             eth3subnetMask=dict(required=False, type='str'),
             eth3gatewayAddress=dict(required=False, type='str'),
+            eth4portgroup=dict(required=True, type='str'),
+            eth5portgroup=dict(required=True, type='str'),
             userdata=dict(required=False, type='str')
         ),
         supports_check_mode=True
@@ -129,8 +131,8 @@ def main():
                                           '--diskMode={}'.format(module.params['disk_mode']),
                                           '--datastore={}'.format(module.params['datastore']),
                                           '--net:GE4={}'.format(module.params['eth3portgroup']),
-                                          '--net:GE5=null',
-                                          '--net:GE6=null',
+                                          '--net:GE5={}'.format(module.params['eth4portgroup']),
+                                          '--net:GE6={}'.format(module.params['eth5portgroup']),
                                           '--net:GE1={}'.format(module.params['eth0portgroup']),
                                           '--net:GE2={}'.format(module.params['eth1portgroup']),
                                           '--net:GE3={}'.format(module.params['eth2portgroup']),

@@ -11,9 +11,6 @@
   register: vcg_results
   tags: vcg
 
-- debug:
-    msg: "{{ vcg_results }}"
-
 - name: deploy_vcg
   vcg_deploy_ova:
     ovftool_path: '{{ ovfToolPath }}'

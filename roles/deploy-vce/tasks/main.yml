@@ -1,0 +1,51 @@
+---
+- name: Manage Velocloud Eges
+  edge:
+    host: "{{ vco.eth0.natipAnsible }}"
+    user: "{{ vco.username }}"
+    password: "{{ vco.password }}"
+    edge_name: "{{ vce.hostname }}"
+    description: "{{ vce.description }}"
+    enterpriseId: "{{ enterprise.entreprise_id }}"
+    configurationId: "{{ profile.profile_id }}"
+    state: present
+  register: vce_results
+  tags: vce
+
+- name: deploy_vce
+  vce_deploy_ova:
+    ovftool_path: '{{ ovfToolPath }}'
+    ova_file: '{{ vce.image }}'
+    vcenter: '{{ deployVcIPAddress }}'
+    vcenter_user: '{{ deployVcUser }}'
+    vcenter_passwd: '{{ deployVcPassword }}'
+    datacenter: '{{ deployDataCenterName }}'
+    cluster: '{{ deployCluster }}'
+    datastore: '{{ deployMgmtDatastoreName }}'
+    vmname: '{{ vce.hostname }}'
+    instanceid: '{{ vce.instanceid }}'
+    vcoaddress: '{{ vco.eth0.ipAddress }}'
+    activationcode: "{{ vce_results.meta.activationKey }}"
+    hostname: '{{ vce.hostname }}'
+    password: '{{ vce.password }}'
+    publickeys: '{{ vce.publickeys }}'
+    #dns1: '{{ dns1 }}'
+    #dns2: '{{ dns2 }}'
+    eth0portgroup: '{{ vce.eth0.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    eth1portgroup: '{{ vce.eth1.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    eth2portgroup: '{{ vce.eth2.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    eth2ipAllocationType: '{{ vce.eth2.ipAllocationType }}'
+    eth2ipAddress: '{{ vce.eth2.ipAddress }}'
+    eth2subnetMask: '{{ vce.eth2.subnetMask }}'
+    eth2gatewayAddress: '{{ vce.eth2.gatewayAddress }}'
+    eth3portgroup: '{{ vce.eth3.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    eth3ipAllocationType: '{{ vce.eth3.ipAllocationType }}'
+    eth3ipAddress: '{{ vce.eth3.ipAddress }}'
+    eth3subnetMask: '{{ vce.eth3.subnetMask }}'
+    eth3gatewayAddress: '{{ vce.eth3.gatewayAddress }}'
+    eth4portgroup: '{{ vce.eth4.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    eth5portgroup: '{{ vce.eth5.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
+    userdata: "{{ lookup('template', 'templates/vce-user-data.j2') | b64encode }}"
+  register: deploy_vce
+
+
