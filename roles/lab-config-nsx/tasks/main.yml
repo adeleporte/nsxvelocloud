@@ -164,9 +164,9 @@
                translatedPort: 'any'
              }
 - name: Set default firewall rule policy
-    nsx_edge_firewall:
-      nsxmanager_spec: "{{ nsxmanager_spec }}"
-      mode: 'set_default_action'
-      edge_name: 'AnsibleInternetRouter'
-      default_action: 'accept'
+  nsx_edge_firewall:
+    nsxmanager_spec: "{{ nsxmanager_spec }}"
+    mode: 'set_default_action'
+    edge_name: 'AnsibleInternetRouter'
+    default_action: 'accept'
  
