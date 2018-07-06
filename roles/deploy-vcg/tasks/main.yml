@@ -9,7 +9,7 @@
     ip_address: "{{ vcg.eth0.ipAddress }}"
     state: present
   register: vcg_results
-  tags: vcg
+  tags: velocloud, vcg
 
 - name: deploy_vcg
   vcg_deploy_ova:
@@ -38,5 +38,6 @@
     eth0gatewayAddress: '{{ vcg.eth0.gatewayAddress }}'
     userdata: "{{ lookup('template', 'templates/vcg-user-data.j2') | b64encode }}"
   register: deploy_vcg
+  tags: velocloud, vcg
 
 

@@ -104,4 +104,9 @@
     - role: deploy-vce
   tags: velocloud, vce_install
 
-
+- name: Deploy NSX OVA
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - role: deploy-lubuntu-ova
+  tags: nsx_ova

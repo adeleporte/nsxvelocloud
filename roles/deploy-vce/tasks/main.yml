@@ -8,9 +8,12 @@
     description: "{{ vce.description }}"
     enterpriseId: "{{ enterprise.entreprise_id }}"
     configurationId: "{{ profile.profile_id }}"
+    lan_ip: "{{ vce.lan.ipAddress }}"
+    lat: "{{ vce.lat }}"
+    lon: "{{ vce.long }}"
     state: present
   register: vce_results
-  tags: vce
+  tags: velocloud, vce
 
 - name: deploy_vce
   vce_deploy_ova:
@@ -47,5 +50,6 @@
     eth5portgroup: '{{ vce.eth5.ls|to_portgroup( nsxmanager_spec, transportZoneName ) }}'
     userdata: "{{ lookup('template', 'templates/vce-user-data.j2') | b64encode }}"
   register: deploy_vce
+  tags: velocloud, vce
 
 

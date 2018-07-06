@@ -22,4 +22,8 @@
     eth0subnetMask: '{{ vco.eth0.subnetMask }}'
     eth0gatewayAddress: '{{ vco.eth0.gatewayAddress }}'
     userdata: "{{ lookup('template', 'templates/vco-user-data.j2') | b64encode }}"
+    vco_ip: "{{ vco.eth0.natipAnsible }}"
+    vco_user: "{{ vco.username }}"
+    vco_password: "{{ vco.password }}"
   register: deploy_vco
+  tags: velocloud, deploy_vco

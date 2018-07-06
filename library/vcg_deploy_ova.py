@@ -138,12 +138,17 @@ def main():
                                           '--prop:eth0.ipAddress={}'.format(module.params['eth0ipAddress']),
                                           '--prop:eth0.subnetMask={}'.format(module.params['eth0subnetMask']),
                                           '--prop:eth0.gatewayAddress={}'.format(module.params['eth0gatewayAddress']),
+                                          '--prop:eth1.ipAllocationType=STATIC',
+                                          #'--prop:eth1.ipAddress=1.1.1.1',
+                                          #'--prop:eth1.subnetMask=255.255.255.0',
+                                          #'--prop:eth1.gatewayAddress=1.1.1.254',
                                           '--prop:user-data={}'.format(module.params['userdata']),
                                           ova_file, vi_string])
 
     if ova_tool_result[0] != 0:
         module.fail_json(msg='Failed to deploy OVA, error message from ovftool is: {}'.format(ova_tool_result[1]))
 
+    time.sleep(60)
     module.exit_json(changed=True, ova_tool_result=ova_tool_result)
 
 from ansible.module_utils.basic import *

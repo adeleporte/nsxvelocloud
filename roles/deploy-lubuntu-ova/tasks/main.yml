@@ -1,0 +1,17 @@
+---
+- name: deploy client
+  client_deploy_ova:
+    ovftool_path: "{{ ovfToolPath }}"
+    datacenter: "{{ deployDataCenterName }}"
+    datastore: "{{ deployMgmtDatastoreName}}"
+    portgroup: "{{ item.name|to_portgroup( nsxmanager_spec, transportZoneName ) }}"
+    cluster: "{{ deployCluster }}"
+    vmname: "client-{{ item.name }}"
+    path_to_ova: "{{ nsxmanOvaPath }}"
+    ova_file: "{{ lubuntuOva }}"
+    vcenter: "{{ deployVcIPAddress }}"
+    vcenter_user: "{{ deployVcUser }}"
+    vcenter_passwd: "{{ deployVcPassword }}"
+  with_items: "{{ clients }}"
+  register: deploy_client
+  tags: client_deploy_ova

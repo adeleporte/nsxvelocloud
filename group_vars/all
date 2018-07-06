@@ -28,7 +28,7 @@ deployHostname: 'nsx.cpod-velocloud.shwrfr.mooo.com'
 nsxCliPass: 'VMware1!VMware1!'
 nsxEnPass: 'VMware1!VMware1!'
 
-nsxmanOvaPath: '/home/images'
+nsxmanOvaPath: 'images'
 nsxmanOva: 'VMware-NSX-Manager-6.4.1-8599035.ova'
 ovfToolPath: '/usr/bin'  # Use '/Applications' if using ovftool on a MAC
 
@@ -196,6 +196,8 @@ vce1:
   image: 'images/edge-VC_VMDK-x86_64-3.2.0-49-R320-20180409-GA-updatable-ext4.ova'
   lat: '50.8503463'
   long: '4.351721099999963'
+  lan:
+    ipAddress: '10.0.0.1'
   eth0:
     ls: 'ls_lan_bronze'
   eth1:
@@ -226,6 +228,8 @@ vce2:
   image: 'images/edge-VC_VMDK-x86_64-3.2.0-49-R320-20180409-GA-updatable-ext4.ova'
   lat: '48.1351253'
   long: '11.581980499999986'
+  lan:
+    ipAddress: '10.0.1.1'
   eth0:
     ls: 'ls_lan_silver1'
   eth1:
@@ -256,6 +260,8 @@ vce3:
   image: 'images/edge-VC_VMDK-x86_64-3.2.0-49-R320-20180409-GA-updatable-ext4.ova'
   lat: '40.4167754'
   long: '-3.7037901999999576'
+  lan:
+    ipAddress: '10.0.2.1'
   eth0:
     ls: 'ls_lan_silver2'
   eth1:
@@ -286,6 +292,8 @@ vce4:
   image: 'images/edge-VC_VMDK-x86_64-3.2.0-49-R320-20180409-GA-updatable-ext4.ova'
   lat: '45.4642035'
   long: '9.189981999999986'
+  lan:
+    ipAddress: '10.0.3.1'
   eth0:
     ls: 'ls_lan_silver3'
   eth1:
@@ -316,6 +324,8 @@ vce5:
   image: 'images/edge-VC_VMDK-x86_64-3.2.0-49-R320-20180409-GA-updatable-ext4.ova'
   lat: '48.856614'
   long: '2.3522219000000177'
+  lan:
+    ipAddress: '10.0.4.1'
   eth0:
     ls: 'ls_lan_dc1'
   eth1:
@@ -346,6 +356,8 @@ vce6:
   image: 'images/edge-VC_VMDK-x86_64-3.2.0-49-R320-20180409-GA-updatable-ext4.ova'
   lat: '51.5073509'
   long: '-0.12775829999998223'
+  lan:
+    ipAddress: '10.0.5.1'
   eth0:
     ls: 'ls_lan_dc2'
   eth1:
@@ -367,4 +379,14 @@ vce6:
   eth5:
     ls: 'ls_null'
   publickeys: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQE/9isaw4ToR5GYLm7g6rgLYIZz2c4UdoL4R2DeMypgW1rHv7P0jL3iqR3L+7bY2HggX2DMvdYwXGlKrtoUWY+WhXKiF0tBvH0rWMYR2XZ+s5UiODifkgJ7NEQrOQOwekoHv7l1MmWxI0XVbFYLZ52aMVaQQOljw9SqyMjCAlF2BnXRfSNW86BAF/KiJVhECbvEfrSBH855OGORlXAHtzyTTEpj0zbTHmAzjLKoqTaXjD9IMf38yqDajMa/XwRUKevK+hkvoWCXaKmY+xXy0Csbf4dkNrJBLrEysfRKwKqkxjXJKKBoQ4b+uTGb+x32DPZCphL2ksEx+8oRb/pCKR adeleporte@adeleporte-m01.vmware.com'
-    
+
+# Client Install
+lubuntuOva: 'lubuntu.ova'
+clients:
+  - { name: 'ls_lan_dc1' }
+  - { name: 'ls_lan_dc2' }
+  - { name: 'ls_lan_bronze' }
+  - { name: 'ls_lan_silver1' }
+  - { name: 'ls_lan_silver2' }
+  - { name: 'ls_lan_silver3' }
+ 

@@ -57,7 +57,7 @@ from velocloud.rest import ApiException
 import urllib3
 
 
-def create_edge(host, user, password, name, description, model_number, enterprise_id, configuration_id):
+def create_edge(host, user, password, name, description, model_number, enterprise_id, configuration_id, lan_ip, lat, lon):
     urllib3.disable_warnings()
     velocloud.configuration.verify_ssl = False
     client = velocloud.ApiClient(host=host)
@@ -67,15 +67,31 @@ def create_edge(host, user, password, name, description, model_number, enterpris
     result = {"id": 0,
               "activationKey": 0}
 
+    site = { "contactName": "test", "contactEmail": "test@test.fr", "lat": lat, "lon": lon }
     params = {"name": name,
               "description": description,
               "modelNumber": model_number,
               "enterpriseId": enterprise_id,
+              "site": site,
               "configurationId": configuration_id}
     try:
         res = api.edgeEdgeProvision(params)
         result["id"] = res.id
         result["activationKey"] = res.activationKey
+
+        # Configure lan ip
+        edge_stack = api.edgeGetEdgeConfigurationStack({ "enterpriseId": enterprise_id, "edgeId": res.id, "with": ["modules"] })
+        configuration = api.configurationGetConfiguration({ "enterpriseId": enterprise_id, "configurationId": edge_stack[0].id, "with": ["modules"] })
+
+        device_module = None
+        for module in configuration.modules:
+            if module.name == "deviceSettings":
+                device_module = module
+                break
+
+        device_module.data['lan']['networks'][0]['cidrIp'] = lan_ip
+        response = api.configurationUpdateConfigurationModule({"id": device_module.id, "enterpriseId": enterprise_id, "_update": device_module })
+
         return result
     except Exception as e:
         module.exit_json(changed=False, result="Edge was not created")
@@ -133,6 +149,9 @@ def main():
         "modelNumber": {"required": False, "type": "str", "default": "virtual"},
         "enterpriseId": {"required": True, "type": "int"},
         "configurationId": {"required": False, "type": "int"},
+        "lan_ip": {"required": True, "type": "str"},
+        "lat": {"required": False, "type": "str", "default": 0},
+        "lon": {"required": False, "type": "str", "default": 0},
         "state": dict(default='present', choices=['present', 'absent'])
     }
     module = AnsibleModule(argument_spec=fields)
@@ -144,13 +163,16 @@ def main():
     model_number = module.params['modelNumber']
     enterprise_id = module.params['enterpriseId']
     configuration_id = module.params['configurationId']
+    lan_ip = module.params['lan_ip']
+    lat = module.params['lat']
+    lon = module.params['lon']
     edge_name = module.params['edge_name']
 
     edge = get_edge(host, user, password, edge_name, enterprise_id)
     if not edge:
         # Edge doesn't exist with this name, let's create it
         if module.params['state'] == 'present':
-            create_result = create_edge(host, user, password, edge_name, description, model_number, enterprise_id, configuration_id)
+            create_result = create_edge(host, user, password, edge_name, description, model_number, enterprise_id, configuration_id, lan_ip, lat, lon)
             module.exit_json(changed=True, argument_spec=module.params, meta=create_result)
         else:
             module.exit_json(changed=False, argument_spec=module.params)
