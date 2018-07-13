@@ -370,9 +370,9 @@ vce6:
     ls: 'ls_internet_dc2'
   eth3:
     ipAllocationType: 'STATIC'
-    ipAddress: '192.168.20.100'
+    ipAddress: '192.168.11.100'
     subnetMask: '255.255.255.0'
-    gatewayAddress: '192.168.20.1'
+    gatewayAddress: '192.168.11.1'
     ls: 'ls_mpls_dc2'
   eth4:
     ls: 'ls_null'

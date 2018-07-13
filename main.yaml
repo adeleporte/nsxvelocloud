@@ -1,5 +1,5 @@
 ---
-- name: Deploy NSX OVA
+- name: Deploy NSX/VELOCLOUD OVA and perform basic setup
   hosts: localhost
   gather_facts: False
   roles:
@@ -7,22 +7,22 @@
     - role: base-config-nsx
     - role: lab-config-nsx
     - role: deploy-vco-ova
-  tags: nsx_ova
+  tags: ova
 
-- name: Lab Velocloud Deployment (Deploy VCG2)
+- name: Lab Velocloud Deployment (Deploy VCG1)
   hosts: localhost  
   gather_facts: False
   vars:
-     vcg: '{{ vcg1 }}'
+    vcg: '{{ vcg1 }}'
   roles:
     - role: deploy-vcg
   tags: velocloud, vcg_install
 
-- name: Lab Velocloud Deployment (Deploy VCG2)
+- name: Lab Velocloud Deployment (Deploy VCG1)
   hosts: localhost
   gather_facts: False
   vars:
-     vcg: '{{ vcg2 }}'
+    vcg: '{{ vcg2 }}'
   roles:
     - role: deploy-vcg
   tags: velocloud, vcg_install
